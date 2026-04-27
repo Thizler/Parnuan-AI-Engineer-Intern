@@ -44,6 +44,7 @@ def run_evaluation(model_name, dataset_path, price_per_1k=0.11):
             regex_hits += 1
 
         start_time = time.time()
+        # เรียกใช้โมเดลตามที่กำหนดใน __main__
         response = ner.parse(text)
         latencies.append(time.time() - start_time)
         
@@ -106,7 +107,7 @@ def run_evaluation(model_name, dataset_path, price_per_1k=0.11):
     print(f"| :--- | :--- |")
     print(f"| **Avg F1 Score** | **{avg_f1:.4f}** |")
     print(f"| Avg Latency | {avg_lat:.2f}s |")
-    print(f"| **p95 Latency** | **{p95_lat:.2f}s** |") # เพิ่มส่วน p95 เข้าไป
+    print(f"| **p95 Latency** | **{p95_lat:.2f}s** |") 
     print(f"| Normal Cost (No Regex) | ${normal_cost:.6f} |")
     print(f"| Optimized Cost | ${optimized_cost:.6f} |")
     print(f"| **Total Savings ($)** | **${savings_usd:.6f}** |")
@@ -131,9 +132,9 @@ if __name__ == "__main__":
     DATASET = "data/transactions_dataset.jsonl"
     results = []
     
+    # models ที่เลือกใช้ OpenAi
     models = [
-        {"id": "google/gemini-2.5-flash", "cost": 0.11}, # ราคาต่อ 1k messages
-        {"id": "openai/gpt-4o-mini", "cost": 0.15}
+        {"id": "anthropic/claude-haiku-4.5", "cost": 0.003} 
     ]
     
     for m in models:

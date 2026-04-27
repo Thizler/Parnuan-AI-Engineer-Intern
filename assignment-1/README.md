@@ -140,4 +140,4 @@ Extraction Logic: ใช้ระบบ "JSON Cleaning" โดยใช้ Regex
 | --- | --- | --- | --- | --- |
 | Claude Haiku 4.5 | 0.9688 | 88.6% | 1.26s / 1.90s | $0.000147 |
 | Google Gemini 2.5 Flash | 0.9519 | 87.1% | 0.98s / 2.10s | $0.005390 | 
-| OpenAI GPT-4o-mini,0.9241 | 84.3% | 0.76s / 1.59s | $0.007350 |
+| OpenAI GPT-4o-mini | 0.9241 | 84.3% | 0.76s / 1.59s | $0.007350 |

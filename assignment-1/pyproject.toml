@@ -1,0 +1,13 @@
+# pyproject.toml
+[project]
+name = "parnuan-ner"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "httpx",
+    "python-dotenv",
+    "tqdm",
+    "pydantic",
+    "openai>=2.32.0",
+    "pandas>=3.0.2",
+]

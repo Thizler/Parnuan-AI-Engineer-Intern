@@ -1,5 +1,6 @@
 import os
 import json
+import re  # เพิ่มการนำเข้า re สำหรับ Regex
 from pathlib import Path
 from typing import List
 from pydantic import BaseModel, Field
@@ -44,8 +45,35 @@ class NERSystem:
         5. NEVER hallucinate or invent data not present in the text.
         6. Always return a JSON object with the key 'transactions'."""
 
+    def parse_with_regex(self, text: str):
+        """
+        [Bonus] Cost Optimization: ลองสกัดข้อมูลด้วย Regex สำหรับกรณีพื้นฐาน 
+        เพื่อลดภาระของ LLM และลด Latency
+        """
+        # Pattern สำหรับ: รายละเอียด [เว้นวรรค] จำนวนเงิน [บาท/฿]
+        # รองรับภาษาไทย อังกฤษ และตัวเลขทศนิยม
+        pattern = r"^([\u0E00-\u0E7Fa-zA-Z\s]+?)\s+(\d+(?:\.\d+)?)\s*(?:บาท|฿)?$"
+        
+        match = re.match(pattern, text.strip())
+        if match:
+            detail = match.group(1).strip()
+            amount = float(match.group(2))
+            
+            # ส่งคืนในรูปแบบ TransactionResponse เพื่อให้ Interface เหมือนกัน
+            return TransactionResponse(transactions=[
+                Transaction(amount=amount, detail=detail)
+            ])
+        return None
+
     def parse(self, text: str) -> TransactionResponse:
-        """แปลงข้อความดิบให้เป็นโครงสร้างข้อมูล JSON"""
+        """แปลงข้อความดิบให้เป็นโครงสร้างข้อมูล JSON โดยใช้ Hybrid Approach"""
+        
+        # 1. ลองใช้ Regex ก่อนสำหรับเคสง่าย ๆ เพื่อความเร็วและประหยัด (Cost & Latency Optimization)
+        regex_result = self.parse_with_regex(text)
+        if regex_result:
+            return regex_result
+
+        # 2. หาก Regex ไม่ครอบคลุม (เช่น มีหลายรายการหรือซับซ้อน) ค่อยส่งให้ LLM
         try:
             response = self.client.chat.completions.create(
                 model=self.model_name,
@@ -63,6 +91,6 @@ class NERSystem:
             return TransactionResponse(**data)
             
         except Exception as e:
-            # กลไก Graceful Degradation: หากพัง ให้คืนค่าว่างเสมอเพื่อไม่ให้ระบบล่ม
+            # กลไก Graceful Degradation: หากพัง ให้คืนค่าว่างเสมอ
             print(f"\n❌ Error parsing text '{text[:20]}...': {e}")
             return TransactionResponse(transactions=[])

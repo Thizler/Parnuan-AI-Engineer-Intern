@@ -9,4 +9,5 @@ dependencies = [
     "tqdm",
     "pydantic",
     "openai>=2.32.0",
+    "pandas>=3.0.2",
 ]

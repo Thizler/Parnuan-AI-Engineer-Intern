@@ -26,9 +26,9 @@ Rules:
 Robust JSON Extraction & Cleaning Strategy:
 เนื่องจากโมเดลระดับสูง (โดยเฉพาะ Claude 4.5 หรือโมเดลที่มีระบบ Extended Thinking) มักจะส่งคำตอบที่มีส่วนประกอบอื่นนอกเหนือจาก JSON เช่น คำอธิบายนำหน้า (Preamble), ความคิดของโมเดล (Thinking Trace), หรือเครื่องหมาย Markdown (```json) ซึ่งจะส่งผลให้ฟังก์ชัน json.loads() มาตรฐานเกิดข้อผิดพลาดในการประมวลผล (Parsing Error)
 เพื่อแก้ปัญหานี้และรักษา Output Contract ให้มั่นคงที่สุด ผมจึงได้ออกแบบระบบ Robust Parsing ดังนี้:
-- Regex-based Isolation: ใช้ Regular Expression รูปแบบ \{.*\} (สกัดข้อความระหว่างปีกกาคู่แรกและคู่สุดท้าย) เพื่อดึงเฉพาะโครงสร้าง JSON Object ออกจากข้อความดิบ (Raw Text) ทั้งหมด.
-- Resilience & Graceful Degradation: วิธีนี้ช่วยให้ระบบสามารถสกัดข้อมูลได้อย่างถูกต้อง 100% แม้ LLM จะตอบข้อความอื่นปนมา หรือมีการตอบกลับที่ผิดรูปแบบ (Malformed).
-- Validation Layer: หลังจากสกัด JSON ออกมาแล้ว ระบบจะใช้ Pydantic ในการตรวจสอบความถูกต้องของฟิลด์ข้อมูล (amount และ detail) อีกครั้งก่อนส่งออก เพื่อป้องกันปัญหาเรื่อง Type Error หรือข้อมูลที่อาจหลอนขึ้นมาเอง (Hallucination).
+- Regex-based Isolation: ใช้ Regular Expression รูปแบบ \{.*\} (สกัดข้อความระหว่างปีกกาคู่แรกและคู่สุดท้าย) เพื่อดึงเฉพาะโครงสร้าง JSON Object ออกจากข้อความดิบ (Raw Text) ทั้งหมด
+- Resilience & Graceful Degradation: วิธีนี้ช่วยให้ระบบสามารถสกัดข้อมูลได้อย่างถูกต้อง 100% แม้ LLM จะตอบข้อความอื่นปนมา หรือมีการตอบกลับที่ผิดรูปแบบ (Malformed)
+- Validation Layer: หลังจากสกัด JSON ออกมาแล้ว ระบบจะใช้ Pydantic ในการตรวจสอบความถูกต้องของฟิลด์ข้อมูล (amount และ detail) อีกครั้งก่อนส่งออก เพื่อป้องกันปัญหาเรื่อง Type Error หรือข้อมูลที่อาจหลอนขึ้นมาเอง (Hallucination)
 ## **4. Eval Methodology**
 การวัดผลใช้ Script อัตโนมัติที่คำนวณ Metrics เชิงลึกดังนี้: 
 - Field-level Metrics: Precision, Recall, F1 แยกรายฟิลด์ amount และ detail

@@ -1,18 +1,18 @@
 # **🚀 Parnuan AI Engineer Intern — Text → Transaction NER System**
 ระบบสกัดข้อมูลธุรกรรม (Entity Extraction) จากข้อความภาษาไทยและภาษาอังกฤษแบบผสม โดยเน้นความแม่นยำสูง ต้นทุนต่ำ และการทำงานที่ทนทาน (Robustness) ภายใต้สเกลผู้ใช้งานจำนวนมาก
-# ** 1. Approach (แนวทางการออกแบบ) **
+## ** 1. Approach (แนวทางการออกแบบ) **
 ผมเลือกใช้สถาปัตยกรรมแบบ Hybrid Architecture เพื่อตอบโจทย์เรื่องต้นทุน (Cost) และความเร็ว (Latency) โดยไม่เสียความแม่นยำ:
 - Tier 1: Regex Engine (Pattern Matching): ดักจับข้อความที่เป็นรูปแบบพื้นฐาน (Happy Path) เช่น "ข้าวมันไก่ 50" เพื่อประมวลผลทันทีโดยไม่เสียค่า API และไม่มี Latency
 - Tier 2: LLM Fallback (OpenRouter): สำหรับข้อความที่ซับซ้อน มีหลายรายการ หรือมีภาษาสแลง ระบบจะส่งต่อให้ LLM ประมวลผล
 - Robust Parsing: ใช้ระบบสกัด JSON ที่ยืดหยุ่น (Regex-based JSON Extraction) เพื่อป้องกัน Error จากโมเดลที่แอบใส่ Markdown หรือ Thinking Trace มาในคำตอบ
-# ** 2. Dataset (ข้อมูลที่ใช้ทดสอบ) **
+## ** 2. Dataset (ข้อมูลที่ใช้ทดสอบ) **
 - ขนาด: 70 Labeled Examples
 - ความครอบคลุม:
   - Single/Multi-transaction: ครอบคลุมทั้งรายการเดียวและหลายรายการในประโยคเดียว
   - Thai/English Slang: ข้อความที่มีภาษาสแลงและคำทับศัพท์
   - Non-transaction: ข้อความทักทายทั่วไป เพื่อทดสอบว่าระบบต้องคืนค่าว่าง (Empty Array)
   - Adversarial: ข้อความที่ตั้งใจให้ระบบพัง เช่น Prompt Injection และข้อความที่มีแต่ตัวเลข
-# ** 3. Prompt / Parsing Strategy **
+## ** 3. Prompt / Parsing Strategy **
 System Prompt:
 ```
 You are a data generation assistant for a Named Entity Recognition (NER) system.
@@ -128,13 +128,13 @@ Output ONLY JSONL
 Now generate the dataset.
 ```
 Extraction Logic: ใช้ระบบ "JSON Cleaning" โดยใช้ Regex ค้นหาเฉพาะส่วนที่เป็น {...} เพื่อให้ระบบสามารถอ่านค่าจาก LLM ได้แม้มีการตอบข้อความอื่นปนมา
-# ** 4. Eval Methodology **
+## ** 4. Eval Methodology **
 การวัดผลใช้ Script อัตโนมัติที่คำนวณ Metrics เชิงลึกดังนี้: 
 - Field-level Metrics: Precision, Recall, F1 แยกรายฟิลด์ amount และ detail
 - Exact-match Rate: วัดความถูกต้องของ Transaction Array ทั้งหมดในหนึ่งข้อความ
 - Latency p50/p95: วัดความเสถียรของความเร็วในการตอบสนอง
 - Failure Taxonomy: จำแนกประเภทความผิดพลาดเพื่อนำไปปรับปรุง Prompt ต่อไป
-# ** 5. Model Comparison Table **
+## ** 5. Model Comparison Table **
 สรุปผลจากการรัน Eval 3 รอบต่อโมเดล (ใช้ค่าที่ดีที่สุด):
 | **Model** | **Avg F1 Score** | **Exact Match** | **p50 / p95 Latency** | **$/1k messages (Opt.)** |
 | --- | --- | --- | --- | --- |
